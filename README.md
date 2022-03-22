@@ -1,2 +1,2 @@
-# Pytorch-AAE
-A pytorch implementation for Adversarial Autoencoders (AAE)
+# pytorch-AAE
+A pytorch implementation for Autoencoders(AE), Variational Autoencoders (VAE) and Adversarial Autoencoders (AAE).
