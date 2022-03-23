@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.transforms import ToTensor
 from model.ae import AutoEncoder
+from utils.logging_ import init_logger
 
 
 logger = logging.getLogger(__name__)
@@ -34,6 +35,7 @@ class AEoptimizer():
 
         model = AutoEncoder()
         device = torch.device(f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")
+        init_logger(rank=0, filenmae=self.args.output_dir/"default.log")
         logger.info(f"training on {device}")
         model.to(device)
         writer = SummaryWriter("/".join([self.args.output_dir, "tb"]))
@@ -47,6 +49,7 @@ class AEoptimizer():
             valid_epoch_loss = 0
 
             for batch in train_dataloader:
+                batch[0].to(device)
                 out = model(batch[0])
                 loss = loss_fn(out, batch[0])
 
@@ -57,6 +60,7 @@ class AEoptimizer():
                 train_epoch_loss += loss.data
 
             for batch in valid_dataloader:
+                batch[0].to(device)
                 out = model(batch[0])
                 loss = loss_fn(out, batch[0])
 
