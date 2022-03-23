@@ -46,9 +46,9 @@ class AEoptimizer():
         for epoch in range(1, self.args.epoch_num+1):
 
             train_epoch_loss = 0
-            valid_epoch_loss = 0
-
+            train_iter = 0
             for batch in train_dataloader:
+                model.train(mode=True)
                 batch[0].to(device)
                 out = model(batch[0])
                 loss = loss_fn(out, batch[0])
@@ -58,17 +58,20 @@ class AEoptimizer():
                 optimizer.step()
 
                 train_epoch_loss += loss.data
+                train_iter += 1
+            train_epoch_loss /= train_iter
 
+            valid_epoch_loss = 0
+            valid_iter = 0
             for batch in valid_dataloader:
+                model.eval()
                 batch[0].to(device)
                 out = model(batch[0])
                 loss = loss_fn(out, batch[0])
 
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-
                 valid_epoch_loss += loss.data
+                valid_iter += 1
+            train_epoch_loss /= train_iter
 
             logger.info(",".join([
                 f"epoch={epoch:03d}",
