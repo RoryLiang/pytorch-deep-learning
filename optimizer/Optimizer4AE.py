@@ -1,6 +1,5 @@
 import torch
 import logging
-from icecream import ic
 from torch import nn
 from torchvision import datasets
 from torch.utils.data import DataLoader
@@ -18,34 +17,31 @@ class AEoptimizer():
 
     def optimize(self):
         train_dataset = datasets.MNIST(
-            root="../data",
+            root=self.args.data_dir,
             train=True,
             transform=ToTensor(),
             download=True
         )
         valid_dataset = datasets.MNIST(
-            root="../data",
+            root=self.args.data_dir,
             train=False,
             transform=ToTensor(),
             download=True
         )
 
-        train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-        valid_dataloader = DataLoader(valid_dataset, batch_size=16, shuffle=True)
+        train_dataloader = DataLoader(train_dataset, batch_size=self.args.batch_size, shuffle=True)
+        valid_dataloader = DataLoader(valid_dataset, batch_size=self.args.batch_size, shuffle=True)
 
         model = AutoEncoder()
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        logger.info(f"train on {device}")
+        device = torch.device(f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")
+        logger.info(f"training on {device}")
         model.to(device)
-        output_path = "../output"
-        writer = SummaryWriter("/".join([output_path, "tb"]))
+        writer = SummaryWriter("/".join([self.args.output_dir, "tb"]))
 
-        epoch_num = 100
-        learning_rate = 1e-3
         loss_fn = nn.MSELoss()
-        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+        optimizer = torch.optim.Adam(model.parameters(), lr=self.args.learning_rate)
 
-        for epoch in range(1, epoch_num+1):
+        for epoch in range(1, self.args.epoch_num+1):
 
             train_epoch_loss = 0
             valid_epoch_loss = 0
@@ -71,10 +67,10 @@ class AEoptimizer():
                 valid_epoch_loss += loss.data
 
             logger.info(",".join([
-                f"epoch={epoch}",
-                f"valid_loss={train_epoch_loss}",
-                f"valid_loss={valid_epoch_loss}"
+                f"epoch={epoch:03d}",
+                f"training_loss={train_epoch_loss:.4f}",
+                f"validation_loss={valid_epoch_loss:.4f}"
             ]))
 
-            writer.add_scalar("training_loss", train_epoch_loss, epoch)
-            writer.add_scalar("validation_loss", valid_epoch_loss, epoch)
+            writer.add_scalar("loss/training_loss", train_epoch_loss, epoch)
+            writer.add_scalar("loss/validation_loss", valid_epoch_loss, epoch)

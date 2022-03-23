@@ -1,11 +1,12 @@
 import sys
-sys.path.append("/home/liangtianyu/aae/Pytorch-AAE")
 from optimizer.Optimizer4AE import AEoptimizer
+from config.args import get_args
+sys.path.append("/home/liangtianyu/aae/Pytorch-AAE")
 
 
 def main():
-    optimizer = AEoptimizer(1)
-    optimizer.optimize()
+    ae_optimizer = AEoptimizer(get_args())
+    ae_optimizer.optimize()
 
 
 if __name__ == "__main__":
