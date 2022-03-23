@@ -1,7 +1,7 @@
 import sys
+sys.path.append("/home/liangtianyu/aae/Pytorch-AAE")
 from optimizer.Optimizer4AE import AEoptimizer
 from config.args import get_args
-sys.path.append("/home/liangtianyu/aae/Pytorch-AAE")
 
 
 def main():
