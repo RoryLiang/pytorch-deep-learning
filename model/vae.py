@@ -20,16 +20,21 @@ class VAE(nn.Module):
             nn.Linear(in_features=256, out_features=28*28)
         )
 
-    def sample_z_from_distribution(self, z_mean, z_logvar):
+    def sample_z_from_distribution(self, z_mean, z_logvar):  # z is sampled from lantent dim Joint Gaussian distribution
         epsilon = torch.rand_like(z_mean)  # sample e from a normal distribution
-        return z_mean + epsilon * torch.exp(z_logvar/2.)
+        return z_mean + epsilon * torch.exp(z_logvar/2.)  # trick to simplify computation
 
     def encoder(self, x):
         x = self.encode_nn(x)
         z_mean = self.z_mean_generater(x)
         z_logvar = self.z_logvar_generater(x)
-        z_sampled = self.sample_z_from_distribution(z_mean, z_logvar)
-        return z_sampled
+        return z_mean, z_logvar
 
     def decoder(self, x):
-        self.decode_nn(x)
+        return self.decode_nn(x)
+
+    def forward(self, x):
+        z_mean, z_logvar = self.encoder(x)
+        z_sampled = self.sample_z_from_distribution(z_mean, z_logvar)
+        decoder_out = self.decoder(z_sampled)
+        return z_mean, z_logvar, z_sampled, decoder_out
