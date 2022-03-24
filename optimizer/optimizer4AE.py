@@ -45,7 +45,7 @@ class AEoptimizer():
 
         model = AutoEncoder()
         device = torch.device(f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")
-        init_logger(rank=0, filenmae=self.args.output_dir/"default.log")
+        init_logger(rank=0, filenmae=self.args.output_dir + "/default.log")
         logger.info(f"training on {device}")
         model.to(device)
         writer = SummaryWriter("/".join([self.args.output_dir, "tb"]))
