@@ -30,8 +30,18 @@ class AEoptimizer():
             download=True
         )
 
-        train_dataloader = DataLoader(train_dataset, batch_size=self.args.batch_size, shuffle=True)
-        valid_dataloader = DataLoader(valid_dataset, batch_size=self.args.batch_size, shuffle=True)
+        train_dataloader = DataLoader(
+            train_dataset,
+            batch_size=self.args.batch_size,
+            shuffle=True,
+            num_workers=4
+        )
+        valid_dataloader = DataLoader(
+            valid_dataset,
+            batch_size=self.args.batch_size,
+            shuffle=True,
+            num_workers=4
+        )
 
         model = AutoEncoder()
         device = torch.device(f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")

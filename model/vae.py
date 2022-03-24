@@ -37,4 +37,4 @@ class VAE(nn.Module):
         z_mean, z_logvar = self.encoder(x)
         z_sampled = self.sample_z_from_distribution(z_mean, z_logvar)
         decoder_out = self.decoder(z_sampled)
-        return z_mean, z_logvar, z_sampled, decoder_out
+        return z_mean, z_logvar, decoder_out
