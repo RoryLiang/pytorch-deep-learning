@@ -81,7 +81,7 @@ class VAEoptimizer():
                 loss.backward()
                 optimizer.step()
 
-                avg_train_epoch_loss += loss.data
+                avg_train_epoch_loss += loss.item()
                 train_iter_num = batch_idx
             avg_train_epoch_loss /= train_iter_num
 
@@ -96,7 +96,7 @@ class VAEoptimizer():
 
                     loss = loss_fn(decoder_out, img)
 
-                    avg_valid_epoch_loss += loss.data
+                    avg_valid_epoch_loss += loss.item()
                     valid_iter_num = batch_idx
                 avg_train_epoch_loss /= valid_iter_num
 
