@@ -45,7 +45,7 @@ class AEoptimizer():
 
         model = AutoEncoder()
         device = torch.device(f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")
-        init_logger(rank=0, filenmae=self.args.output_dir + "/default.log")
+        init_logger(rank=0, filenmae=self.args.output_dir+"/default.log")
         logger.info(f"training on {device}")
         model.to(device)
         writer = SummaryWriter("/".join([self.args.output_dir, "tb"]))
@@ -55,39 +55,42 @@ class AEoptimizer():
 
         for epoch in range(1, self.args.epoch_num+1):
 
-            train_epoch_loss = 0
-            train_iter = 0
-            for batch in train_dataloader:
-                model.train(mode=True)
-                batch[0].to(device)
-                out = model(batch[0])
-                loss = loss_fn(out, batch[0])
+            avg_train_epoch_loss = 0
+            train_iter_num = 0
+            model.train(mode=True)
+            for batch_idx, (img, labels) in enumerate(train_dataloader):
+
+                img = img.to(device)
+                model_out = model(img)
+                loss = loss_fn(model_out, img)
 
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
 
-                train_epoch_loss += loss.data
-                train_iter += 1
-            train_epoch_loss /= train_iter
+                avg_train_epoch_loss += loss.data
+                train_iter_num = batch_idx
+            avg_train_epoch_loss /= train_iter_num
 
-            valid_epoch_loss = 0
-            valid_iter = 0
-            for batch in valid_dataloader:
-                model.eval()
-                batch[0].to(device)
-                out = model(batch[0])
-                loss = loss_fn(out, batch[0])
+            avg_valid_epoch_loss = 0
+            valid_iter_num = 0
+            model.eval()
+            with torch.no_grad():
+                for batch_idx, (img, labels) in valid_dataloader:
 
-                valid_epoch_loss += loss.data
-                valid_iter += 1
-            train_epoch_loss /= train_iter
+                    img = img.to(device)
+                    out = model(img)
+                    loss = loss_fn(out, img)
+
+                    avg_valid_epoch_loss += loss.data
+                    valid_iter_num = batch_idx
+                avg_train_epoch_loss /= valid_iter_num
 
             logger.info(",".join([
                 f"epoch={epoch:03d}",
-                f"training_loss={train_epoch_loss:.4f}",
-                f"validation_loss={valid_epoch_loss:.4f}"
+                f"training_loss={avg_train_epoch_loss:.4f}",
+                f"validation_loss={avg_valid_epoch_loss:.4f}"
             ]))
 
-            writer.add_scalar("loss/training_loss", train_epoch_loss, epoch)
-            writer.add_scalar("loss/validation_loss", valid_epoch_loss, epoch)
+            writer.add_scalar("loss/training_loss", avg_train_epoch_loss, epoch)
+            writer.add_scalar("loss/validation_loss(acc)", avg_valid_epoch_loss, epoch)

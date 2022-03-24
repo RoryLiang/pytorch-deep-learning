@@ -7,6 +7,7 @@ from utils.typed_args import TypedArgs, add_argument
 
 @dataclass
 class Args(TypedArgs):
+    model: str = add_argument("--model", default="ae")
     output_dir: str = add_argument("--output_dir", default="../output")
     data_dir: str = add_argument("--data_dir", default="../data")
     gpu: int = add_argument("--gpu", default=0)

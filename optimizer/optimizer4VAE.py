@@ -45,7 +45,7 @@ class VAEoptimizer():
 
         model = VAE()
         device = torch.device(f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")
-        init_logger(rank=0, filenmae=self.args.output_dir/"default.log")
+        init_logger(rank=0, filenmae=self.args.output_dir+"/default.log")
         logger.info(f"training on {device}")
         model.to(device)
         writer = SummaryWriter("/".join([self.args.output_dir, "tb"]))
@@ -64,6 +64,7 @@ class VAEoptimizer():
                 img = img.to(device)
                 z_mean, z_logvar, decoder_out = model(img)
 
+                # computing loss
                 kl_div = -0.5 * torch.sum(1 + z_logvar - z_mean**2 - torch.exp(z_logvar), axis=1)  # sum over latent dimension
 
                 batchsize = kl_div.size(0)
