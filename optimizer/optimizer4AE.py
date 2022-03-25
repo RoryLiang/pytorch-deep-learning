@@ -58,7 +58,7 @@ class AEoptimizer():
             avg_train_epoch_loss = 0
             train_iter_num = 0
             model.train(mode=True)
-            for batch_idx, (img, labels) in enumerate(train_dataloader):
+            for batch_idx, (img, label) in enumerate(train_dataloader):
 
                 img = img.to(device)
                 model_out = model(img)
@@ -76,7 +76,7 @@ class AEoptimizer():
             valid_iter_num = 0
             model.eval()
             with torch.no_grad():
-                for batch_idx, (img, labels) in valid_dataloader:
+                for batch_idx, (img, label) in valid_dataloader:
 
                     img = img.to(device)
                     out = model(img)
