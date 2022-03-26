@@ -24,21 +24,9 @@ class VAEoptimizer():
             transform=ToTensor(),
             download=True
         )
-        valid_dataset = datasets.MNIST(
-            root=self.args.data_dir,
-            train=False,
-            transform=ToTensor(),
-            download=True
-        )
 
         train_dataloader = DataLoader(
             train_dataset,
-            batch_size=self.args.batch_size,
-            shuffle=True,
-            num_workers=4
-        )
-        valid_dataloader = DataLoader(
-            valid_dataset,
             batch_size=self.args.batch_size,
             shuffle=True,
             num_workers=4
@@ -98,9 +86,9 @@ class VAEoptimizer():
 
             logger.info(",".join([
                 f"epoch={epoch:03d}",
-                f"recon_loss={recon_epoch_loss:.4f}",
+                f"reconstruct_loss={recon_epoch_loss:.4f}",
                 f"dis_loss={dis_epoch_loss:.4f}"
             ]))
 
-            writer.add_scalar("loss/training_loss", recon_epoch_loss, epoch)
-            writer.add_scalar("loss/validation_loss(acc)", dis_epoch_loss, epoch)
+            writer.add_scalar("loss/reconstruct_loss", recon_epoch_loss, epoch)
+            writer.add_scalar("loss/dis_loss", dis_epoch_loss, epoch)

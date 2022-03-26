@@ -89,5 +89,5 @@ class GANoptimizer():
                 f"dis_loss={dis_epoch_loss:.4f}"
             ]))
 
-            writer.add_scalar("loss/training_loss", gen_epoch_loss, epoch)
-            writer.add_scalar("loss/validation_loss(acc)", dis_epoch_loss, epoch)
+            writer.add_scalar("loss/gen_loss", gen_epoch_loss, epoch)
+            writer.add_scalar("loss/dis_loss", dis_epoch_loss, epoch)
