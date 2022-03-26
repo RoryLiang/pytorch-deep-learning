@@ -47,6 +47,9 @@ class GANoptimizer():
 
         for epoch in range(1, self.args.epoch_num+1):
 
+            gen_epoch_loss = 0
+            dis_epoch_loss = 0
+            iteration_num = 0
             for batch_idx, (real_img, label) in enumerate(train_dataloader):
 
                 # train generator
@@ -55,6 +58,7 @@ class GANoptimizer():
                 fake_img = generator(rand_noise_z)
                 fake_label = torch.zeros(self.args.batch_size, device=device)
                 gen_loss = loss_fn(discriminator(fake_img), fake_label)
+                gen_epoch_loss += gen_loss
 
                 gen_optimizer.zero_grad()
                 gen_loss.backward()
@@ -68,16 +72,22 @@ class GANoptimizer():
                 fake_dis_loss = loss_fn(discriminator(fake_img), fake_label)
 
                 dis_loss = (real_dis_loss + fake_dis_loss) / 2
+                dis_epoch_loss += dis_loss
 
                 dis_optimizer.zero_grad()
                 dis_loss.backward
                 dis_optimizer.step()
 
+                iteration_num = batch_idx
+
+            gen_epoch_loss /= iteration_num
+            dis_epoch_loss /= iteration_num
+
             logger.info(",".join([
                 f"epoch={epoch:03d}",
-                f"gen_loss={gen_loss:.4f}",
-                f"dis_loss={dis_loss:.4f}"
+                f"gen_loss={gen_epoch_loss:.4f}",
+                f"dis_loss={dis_epoch_loss:.4f}"
             ]))
 
-            writer.add_scalar("loss/training_loss", gen_loss, epoch)
-            writer.add_scalar("loss/validation_loss(acc)", dis_loss, epoch)
+            writer.add_scalar("loss/training_loss", gen_epoch_loss, epoch)
+            writer.add_scalar("loss/validation_loss(acc)", dis_epoch_loss, epoch)
