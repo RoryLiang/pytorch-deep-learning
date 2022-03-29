@@ -72,7 +72,7 @@ class AEoptimizer():
                 optimizer.step()
 
                 avg_train_epoch_loss += loss.item()
-                train_iter_num = batch_idx
+                train_iter_num = batch_idx + 1
             avg_train_epoch_loss /= train_iter_num
 
             avg_valid_epoch_loss = 0
@@ -88,7 +88,7 @@ class AEoptimizer():
                     loss = loss_fn(out, img)
 
                     avg_valid_epoch_loss += loss.item()
-                    valid_iter_num = batch_idx
+                    valid_iter_num = batch_idx + 1
                 avg_valid_epoch_loss /= valid_iter_num
                 raw_img = img
                 recon_img = out
