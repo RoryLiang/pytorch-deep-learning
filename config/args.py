@@ -11,7 +11,7 @@ class Args(TypedArgs):
     output_dir: str = add_argument("--output_dir", default="../output")
     data_dir: str = add_argument("--data_dir", default="../data")
     gpu: int = add_argument("--gpu", default=0)
-    batch_size: int = add_argument("--batch_size", default=16)
+    batch_size: int = add_argument("--batch_size", default=128)
     epoch_num: int = add_argument("--epoch_num", default=100)
     learning_rate: float = add_argument("--learning_rate", default=1e-3)
 

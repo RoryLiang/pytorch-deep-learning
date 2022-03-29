@@ -8,9 +8,9 @@ from config.args import get_args
 def main():
     args = get_args()
     if args.model == "ae":
-        optimizer = AEoptimizer()
+        optimizer = AEoptimizer(args)
     elif args.model == "vae":
-        optimizer = VAEoptimizer()
+        optimizer = VAEoptimizer(args)
     else:
         raise Exception(f"Invalid model option: {args.model}, try: --model ae")
     optimizer.optimize()

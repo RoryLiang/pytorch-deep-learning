@@ -1,5 +1,6 @@
 import torch
 import logging
+from icecream import ic
 from torch import nn
 from torchvision import datasets
 from torch.utils.data import DataLoader
@@ -47,6 +48,8 @@ class AEoptimizer():
         device = torch.device(f"cuda:{self.args.gpu}" if torch.cuda.is_available() else "cpu")
         init_logger(rank=0, filenmae=self.args.output_dir+"/default.log")
         logger.info(f"training on {device}")
+        config_str = ic.format(self.args)
+        logger.info(f"config: {config_str}")
         model.to(device)
         writer = SummaryWriter("/".join([self.args.output_dir, "tb"]))
 
@@ -74,9 +77,11 @@ class AEoptimizer():
 
             avg_valid_epoch_loss = 0
             valid_iter_num = 0
+            raw_img = None
+            recon_img = None
             model.eval()
             with torch.no_grad():
-                for batch_idx, (img, label) in valid_dataloader:
+                for batch_idx, (img, label) in enumerate(valid_dataloader):
 
                     img = img.to(device)
                     out = model(img)
@@ -84,13 +89,20 @@ class AEoptimizer():
 
                     avg_valid_epoch_loss += loss.item()
                     valid_iter_num = batch_idx
-                avg_train_epoch_loss /= valid_iter_num
+                avg_valid_epoch_loss /= valid_iter_num
+                raw_img = img
+                recon_img = out
 
             logger.info(",".join([
-                f"epoch={epoch:03d}",
-                f"training_loss={avg_train_epoch_loss:.4f}",
+                f"epoch={epoch:03d} ",
+                f"training_loss={avg_train_epoch_loss:.4f} ",
                 f"validation_loss={avg_valid_epoch_loss:.4f}"
             ]))
 
             writer.add_scalar("loss/training_loss", avg_train_epoch_loss, epoch)
             writer.add_scalar("loss/validation_loss(acc)", avg_valid_epoch_loss, epoch)
+            writer.add_images("img/raw_img", raw_img, epoch, dataformats="NCHW")
+            writer.add_images("img/reconstruction_img", recon_img, epoch, dataformats="NCHW")
+
+        writer.close()
+        torch.save(model, self.args.output_dir+"/model.pth")
